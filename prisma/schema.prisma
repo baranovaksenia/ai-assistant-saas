@@ -1,0 +1,15 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Определите свои модели здесь
+
+model Category {
+  id   String @id @default(cuid()) @map("_id")
+  name String
+}
