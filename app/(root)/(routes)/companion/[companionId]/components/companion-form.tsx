@@ -1,3 +1,12 @@
+/**
+ * Component for rendering a form to create or update a companion.
+ *
+ * @component
+ * @param {Companion | null} initialData - The initial data for the form. If provided, the form will be in update mode.
+ * @param {Category[]} categories - The list of categories for the companion.
+ * @returns {JSX.Element} The rendered form component.
+ */
+
 "use client";
 import * as z from "zod";
 
@@ -27,6 +36,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
 import ImageUpload from "@/components/image-upload";
+import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 interface CompanionFormProps {
   initialData: Companion | null;
@@ -74,6 +86,9 @@ const formSchema = z.object({
 });
 
 const CompanionForm = ({ categories, initialData }: CompanionFormProps) => {
+  // hook useToast
+  const { toast } = useToast();
+  const router = useRouter();
   // form controller
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,7 +105,27 @@ const CompanionForm = ({ categories, initialData }: CompanionFormProps) => {
   const isLoading = form.formState.isSubmitting;
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+    try {
+      if (initialData) {
+        // update companion functionality
+        await axios.patch(`/api/companion/${initialData.id}`, data);
+      } else {
+        // create companion functionality
+        await axios.post(`/api/companion`, data);
+      }
+      toast({
+        description: "Success",
+      });
+      // refresh all server components (new data from db)
+      router.refresh();
+      // push to the homepage
+      router.push("/");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Something went wrong",
+      });
+    }
   };
 
   return (
