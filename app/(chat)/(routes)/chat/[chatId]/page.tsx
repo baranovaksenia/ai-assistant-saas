@@ -1,6 +1,15 @@
+/**
+ * Renders the page for a specific chat ID.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.params - The parameters object containing the chat ID.
+ * @param {string} props.params.chatId - The ID of the chat.
+ * @returns {JSX.Element} The rendered chat page.
+ */
 import prismadb from "@/lib/prismadb";
 import { auth, redirectToSignIn } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
+import ChatClient from "./components/client";
 
 interface ChatIdPageProps {
   params: {
